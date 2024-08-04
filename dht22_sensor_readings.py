@@ -1,10 +1,10 @@
 #!/usr/bin/python3
 
 import adafruit_dht
-from board import D22
+from board import D17
 import logging
 
-dht_device = adafruit_dht.DHT22(D22)
+dht_device = adafruit_dht.DHT22(D17)
 
 def fetch_humidity():
   try:
