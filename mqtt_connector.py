@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!/usr/bin/python3.11
 
 import os
 import time
@@ -29,7 +29,7 @@ def main():
     mqtt_client = mqtt.Client(
         mqtt.CallbackAPIVersion.VERSION2, client_id=CLIENT_ID, clean_session=False
     )
-    mqtt_client.enable_logger()
+    # mqtt_client.enable_logger()
 
     mqtt_client.username_pw_set(CLIENT_USER, CLIENT_PSSWD)
     mqtt_client.max_queued_messages_set(0)
@@ -64,7 +64,7 @@ def on_disconnect(client, userdata, flags, reason_code, properties):
 
 
 def on_publish(client, userdata, mid, reason_codes, properties):
-    logging.debug(reason_codes)
+    logging.debug("State Publish {} ".format(reason_codes))
 
 
 def periodically_publish_dht22_data(client: mqtt.Client) -> None:
@@ -87,6 +87,7 @@ def periodically_publish_dht22_data(client: mqtt.Client) -> None:
             client.publish(
                 "sensor/{}/timestamp/state".format(CLIENT_ID), json.dumps(res["dts"])
             )
+            logging.debug(json.dumps(res))
         except Exception as e:
             logging.error(e)
             continue
