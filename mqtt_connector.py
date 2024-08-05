@@ -4,7 +4,6 @@ import os
 import time
 import logging
 import json
-from datetime import datetime
 from dotenv import load_dotenv
 from typing import Any, Dict
 import paho.mqtt.client as mqtt
@@ -54,26 +53,50 @@ def main():
     mqtt_client.loop_forever(timeout=15, retry_first_connection=True)
 
 
-def on_connect(client, userdata, flags, reason_code, properties):
+def on_connect(
+    client: mqtt.Client,
+    userdata: Any,
+    flags: Dict,
+    reason_code: mqtt.ReasonCodes,
+    properties: mqtt.Properties,
+):
     if reason_code == 0:
         logging.info(f"Connected to MQTT broker at {BROKER_ADDRESS}")
     else:
         logging.error(f"Failed to connect, reason code: {reason_code}")
 
 
-def on_connect_fail(client, userdata, disconnect_flags, reason_code, properties):
+def on_connect_fail(
+    client: mqtt.Client,
+    userdata: Any,
+    disconnect_flags: Dict,
+    reason_code: mqtt.ReasonCodes,
+    properties: mqtt.Properties,
+):
     logging.warning(f"Connect failed with reason code: {reason_code}")
 
 
-def on_disconnect(client, userdata, flags, reason_code, properties):
+def on_disconnect(
+    client: mqtt.Client,
+    userdata: Any,
+    flags: Dict,
+    reason_code: mqtt.ReasonCodes,
+    properties: mqtt.Properties,
+):
     logging.warning(f"Disconnected from MQTT broker, reason code: {reason_code}")
 
 
-def on_publish(client, userdata, mid, reason_codes, properties):
-    logging.debug(f"Message published, reason code: {reason_codes}")
+def on_publish(
+    client: mqtt.Client,
+    userdata: Any,
+    mid: int,
+    reason_code: mqtt.ReasonCodes,
+    properties: mqtt.Properties,
+):
+    logging.debug(f"Message published, reason code: {reason_code}")
 
 
-def periodically_publish_dht22_data(client: mqtt.Client) -> None:
+def periodically_publish_dht22_data(client: mqtt.Client):
     while True:
         try:
             res = {
