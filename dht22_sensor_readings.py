@@ -1,8 +1,8 @@
 #!/usr/bin/python3
 
+import logging
 import adafruit_dht
 from board import D17
-import logging
 
 dht_device = adafruit_dht.DHT22(D17)
 
