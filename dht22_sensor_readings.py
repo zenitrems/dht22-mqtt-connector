@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!/usr/bin/python3.11
 
 import logging
 import board
@@ -13,7 +13,6 @@ def fetch_humidity():
         return humidity
     except Exception as error:
         dht_device.exit()
-        logging.error(error)
         raise error
 
 
@@ -23,5 +22,4 @@ def fetch_temperature():
         return temperature
     except Exception as error:
         dht_device.exit()
-        logging.error(error)
         raise error
