@@ -87,10 +87,10 @@ def periodically_publish_dht22_data(client: mqtt.Client) -> None:
             client.publish(
                 "sensor/{}/timestamp/state".format(CLIENT_ID), json.dumps(res["dts"])
             )
-            time.sleep(PUBLISH_INTERVAL)
         except Exception as e:
             logging.error(e)
             continue
+        time.sleep(PUBLISH_INTERVAL)
 
 
 if __name__ == "__main__":
