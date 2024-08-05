@@ -18,9 +18,6 @@ CLIENT_USER = os.environ.get("CLIENT_USER")
 CLIENT_PSSWD = os.environ.get("CLIENT_PSSWD")
 PUBLISH_INTERVAL = float(os.environ.get("PUBLISH_INTERVAL"))
 
-print(PUBLISH_INTERVAL)
-
-
 def main():
     logging.basicConfig(
         format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
@@ -31,6 +28,8 @@ def main():
     mqtt_client = mqtt.Client(
         mqtt.CallbackAPIVersion.VERSION2, client_id=CLIENT_ID, clean_session=False
     )
+    mqtt_client.enable_logger()
+
     mqtt_client.username_pw_set(CLIENT_USER, CLIENT_PSSWD)
     mqtt_client.max_queued_messages_set(0)
     mqtt_client.connect(BROKER_ADDRESS, int(BROKER_PORT))
@@ -39,6 +38,7 @@ def main():
     mqtt_client.on_publish = on_publish
     periodically_publish_dht22_data(mqtt_client)
     mqtt_client.loop_forever()
+    unacked_publish = set()
 
 
 def on_connect(client, userdata, flags, reason_code, properties):
@@ -65,8 +65,7 @@ def on_disconnect(client, userdata, flags, reason_code, properties):
         logging.info(reason_code)
         
 def on_publish(client, userdata, mid, reason_codes, properties):
-    logging.debug(properties)
-
+    logging.debug(reason_codes)
 def periodically_publish_dht22_data(client: mqtt.Client) -> None:
     while True:
         try:
@@ -75,10 +74,10 @@ def periodically_publish_dht22_data(client: mqtt.Client) -> None:
                 "temperature": dht22.fetch_temperature(),
                 "humidity": dht22.fetch_humidity(),
                 "dts": dts.strftime("%d/%m/%Y %H:%M:%S"),
-            }
-            client.publish("sensor/{}".format(CLIENT_ID), json.dumps(res))
-            logging.info("Published Data: ")
-            logging.info(json.dumps(res))
+            }                
+            client.publish("sensor/{}/temperature/state".format(CLIENT_ID), json.dumps(res["temperature"]))
+            client.publish("sensor/{}/humidity/state".format(CLIENT_ID), json.dumps(res["humidity"]))
+            client.publish("sensor/{}/timestamp/state".format(CLIENT_ID), json.dumps(res["dts"]))
             time.sleep(PUBLISH_INTERVAL)
         except Exception as e:
             logging.error(e)
