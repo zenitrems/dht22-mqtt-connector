@@ -16,8 +16,7 @@ CLIENT_ID = os.environ.get("CLIENT_ID")
 CLIENT_USER = os.environ.get("CLIENT_USER")
 CLIENT_PSSWD = os.environ.get("CLIENT_PSSWD")
 PUBLISH_INTERVAL = float(os.environ.get("PUBLISH_INTERVAL"))
-
-RETRY_INTERVAL = 2
+DHT_RETRY_INTERVAL = float(os.environ.get("DHT_RETRY_INTERVAL"))
 
 TOPIC_TEMPERATURE = f"sensor/{CLIENT_ID}/temperature/state"
 TOPIC_HUMIDITY = f"sensor/{CLIENT_ID}/humidity/state"
@@ -108,8 +107,8 @@ def periodically_publish_dht22_data(client: mqtt.Client):
             logging.debug(json.dumps(res))
         except Exception as e:
             logging.error(f"Error reading sensor data: {e}")
-            logging.info(f"Retrying in {RETRY_INTERVAL} seconds...")
-            time.sleep(RETRY_INTERVAL)
+            logging.info(f"Retrying in {DHT_RETRY_INTERVAL} seconds...")
+            time.sleep(DHT_RETRY_INTERVAL)
             continue
 
         time.sleep(PUBLISH_INTERVAL)
