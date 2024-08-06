@@ -1,0 +1,9 @@
+services:
+  dht22-mqtt-connector:
+    container_name: dht22
+    restart: always
+    build: .
+    devices: 
+      - /dev/gpiomem:/dev/gpiomem
+    env_file:
+      - .env
