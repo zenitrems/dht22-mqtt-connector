@@ -17,6 +17,7 @@ CLIENT_USER = os.environ.get("CLIENT_USER")
 CLIENT_PSSWD = os.environ.get("CLIENT_PSSWD")
 PUBLISH_INTERVAL = float(os.environ.get("PUBLISH_INTERVAL"))
 DHT_RETRY_INTERVAL = float(os.environ.get("DHT_RETRY_INTERVAL"))
+MQTT_RECONNECT_INTERVAL = float(os.environ.get("MQTT_RECONNECT_INTERVAL"))
 
 TOPIC_TEMPERATURE = f"sensor/{CLIENT_ID}/temperature/state"
 TOPIC_HUMIDITY = f"sensor/{CLIENT_ID}/humidity/state"
@@ -46,7 +47,7 @@ def main():
         mqtt_client.connect(BROKER_ADDRESS, (BROKER_PORT))
     except Exception as e:
         logging.error(f"Failed to connect to MQTT broker: {e}")
-        return
+        return on_connect_fail()
 
     periodically_publish_dht22_data(mqtt_client)
     mqtt_client.loop_forever(timeout=15, retry_first_connection=True)
@@ -73,6 +74,9 @@ def on_connect_fail(
     properties: mqtt.Properties,
 ):
     logging.warning(f"Connect failed with reason code: {reason_code}")
+    logging.info(f"Retrying connection in {MQTT_RECONNECT_INTERVAL} seconds...")
+    time.sleep(MQTT_RECONNECT_INTERVAL)
+    client.reconnect()
 
 
 def on_disconnect(
@@ -83,6 +87,9 @@ def on_disconnect(
     properties: mqtt.Properties,
 ):
     logging.warning(f"Disconnected from MQTT broker, reason code: {reason_code}")
+    logging.info(f"Retrying connection in {MQTT_RECONNECT_INTERVAL} seconds...")
+    time.sleep(MQTT_RECONNECT_INTERVAL)
+    client.reconnect()
 
 
 def on_publish(
