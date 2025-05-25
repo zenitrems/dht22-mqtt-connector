@@ -7,7 +7,7 @@ import json
 from dotenv import load_dotenv
 from typing import Any, Dict
 import paho.mqtt.client as mqtt
-import bme280_sensor_readings as bme280  # <-- nombre corregido del módulo
+from bme280_sensor_readings import get_sensor_data  as bme280 
 
 load_dotenv()
 BROKER_ADDRESS = os.environ.get("BROKER_ADDRESS")
@@ -20,7 +20,7 @@ MQTT_RECONNECT_INTERVAL = float(os.environ.get("MQTT_RECONNECT_INTERVAL"))
 
 TOPIC_TEMPERATURE = f"sensor/{CLIENT_ID}/temperature/state"
 TOPIC_HUMIDITY = f"sensor/{CLIENT_ID}/humidity/state"
-TOPIC_PRESSURE = f"sensor/{CLIENT_ID}/pressure/state"  # Agregado
+TOPIC_PRESSURE = f"sensor/{CLIENT_ID}/pressure/state"
 
 def main():
     logging.basicConfig(
@@ -83,10 +83,10 @@ def on_publish(client: mqtt.Client, userdata: Any, mid: int,
 def periodically_publish_BME280_data(client: mqtt.Client):
     while True:
         try:
-            res = bme280.get_sensor_data()
+            res = bme280()
             client.publish(TOPIC_TEMPERATURE, json.dumps(res["temperature"]))
             client.publish(TOPIC_HUMIDITY, json.dumps(res["humidity"]))
-            client.publish(TOPIC_PRESSURE, json.dumps(res["pressure"]))  # Agregado
+            client.publish(TOPIC_PRESSURE, json.dumps(res["pressure"])) 
             logging.debug(json.dumps(res))
         except Exception as e:
             logging.error(f"Error reading sensor data: {e}")

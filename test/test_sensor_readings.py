@@ -6,12 +6,12 @@ import time
 
 sys.path.append(os.getcwd())
 
-import bme280_sensor_readings as bme280  # nombre correcto del módulo
+from bme280_sensor_readings import get_sensor_data  as bme280 
 
 def fetch_readings_every_2_seconds():
     while True:
         try:
-            data = bme280.get_sensor_data()
+            data = bme280()
             print("Temperature: {}°C, Humidity: {}%, Pressure: {} hPa".format(
                 data["temperature"],
                 data["humidity"],

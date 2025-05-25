@@ -1,0 +1,13 @@
+[Unit]
+Description=BME280 MQTT Connector
+After=network.target
+
+[Service]
+ExecStart=/usr/bin/python3.11 mqtt_connector.py
+WorkingDirectory=/home/dietpi/dht22-mqtt-connector
+User=dietpi
+Group=dietpi
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
